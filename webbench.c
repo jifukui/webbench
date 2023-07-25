@@ -86,7 +86,20 @@ static void alarm_handler(int signal)
 }
 /**
  * @brief 用戶指導
- * 
+ * f:不等待服务器的响应
+ * r:发送重加载请求 no-cache
+ * t:设置运行时间默认30秒
+ * p:设置代理服务器
+ * c:一次运行http客户的数量
+ * 9：使用http0.9的版本
+ * 1：使用http1.0的版本
+ * 2：使用http1.1的版本
+ * --get:get 命令
+ * --head:head命令
+ * --options：options命令
+ * --trace:trace命令
+ * ?:帮助手册
+ * -V:程序版本
  */
 static void usage(void)
 {
@@ -119,7 +132,7 @@ int main(int argc, char *argv[])
    int opt = 0;
    int options_index = 0;
    char *tmp = NULL;
-
+   //如果参数数量为1打印用户手册
    if (argc == 1)
    {
       usage();
@@ -193,10 +206,12 @@ int main(int argc, char *argv[])
       return 2;
    }
 
-   if (clients == 0)
+   if (clients == 0){
       clients = 1;
-   if (benchtime == 0)
+   }
+   if (benchtime == 0){
       benchtime = 60;
+   }
    /* Copyright */
    fprintf(stderr, "Webbench - Simple Web Benchmark " PROGRAM_VERSION "\n"
                    "Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.\n");
@@ -247,7 +262,7 @@ int main(int argc, char *argv[])
 }
 /**
  * @brief 創建請求
- * 
+ * 这个主要是生成请求的URL
  * @param url 
  */
 void build_request(const char *url)
@@ -258,14 +273,18 @@ void build_request(const char *url)
    bzero(host, MAXHOSTNAMELEN);
    bzero(request, REQUEST_SIZE);
 
-   if (force_reload && proxyhost != NULL && http10 < 1)
+   if (force_reload && proxyhost != NULL && http10 < 1){
       http10 = 1;
-   if (method == METHOD_HEAD && http10 < 1)
+   }
+   if (method == METHOD_HEAD && http10 < 1){
       http10 = 1;
-   if (method == METHOD_OPTIONS && http10 < 2)
+   }
+   if (method == METHOD_OPTIONS && http10 < 2){
       http10 = 2;
-   if (method == METHOD_TRACE && http10 < 2)
+   }
+   if (method == METHOD_TRACE && http10 < 2){
       http10 = 2;
+   }
 
    switch (method)
    {
@@ -285,7 +304,7 @@ void build_request(const char *url)
    }
 
    strcat(request, " ");
-
+   //校验url是否有效
    if (NULL == strstr(url, "://"))
    {
       fprintf(stderr, "\n%s: is not a valid URL.\n", url);
@@ -296,6 +315,7 @@ void build_request(const char *url)
       fprintf(stderr, "URL is too long.\n");
       exit(2);
    }
+   //只支持http服务
    if (proxyhost == NULL)
       if (0 != strncasecmp("http://", url, 7))
       {
@@ -359,7 +379,7 @@ void build_request(const char *url)
    /* add empty line at end */
    if (http10 > 0)
       strcat(request, "\r\n");
-   // printf("Req=%s\n",request);
+   printf("Req=%s\n",request);
 }
 
 /**
